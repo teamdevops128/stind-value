@@ -1,0 +1,27 @@
+#!/bin/bash
+
+ORG_NAME="niti"
+SEARCH_STRING="@abhi.com"
+BASE_URL="https://api.github.com/search/code?q=${SEARCH_STRING}+org:${ORG_NAME}&per_page=100"
+
+CSV_FILE="string.csv"
+echo "File Name,File Path,Full Name" > "$CSV_FILE"
+
+
+page=1
+while :
+do
+    API_URL="$BASE_URL&page=$page"
+    response=$(curl -s -H "Accept: application/vnd.github.v3+json" -H "Authorization: token $(TOKEN)" "$API_URL")
+    
+    count=$(echo "$response" | jq '.items | length')
+    if [[ "$count" -eq 0 ]]; then
+        break
+    fi
+    
+    echo "$response" | jq -r '.items[] | "\(.name),\(.path),\(.repository.full_name)"' >> "$CSV_FILE"
+    ((page++))
+done
+
+
+echo "CSV file saved as $CSV_FILE"
