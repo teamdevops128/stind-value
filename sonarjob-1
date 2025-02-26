@@ -1,0 +1,42 @@
+#!/bin/bash
+
+SONARCLOUD_API="https://sonarcloud.io/api"
+ORG_KEY=""
+OUTPUT_FILE="sonar_loc_report.csv"
+get_project_keys() {
+    page=1
+    page_size=100
+    project_keys=()
+
+    while true; do
+        response=$(curl -s -u "$SONAR_TOKEN:" "$SONARCLOUD_API/projects/search?organization=$ORG_KEY&p=$page&ps=$page_size")
+        keys=$(echo "$response" | jq -r '.components[].key')
+
+        if [[ -z "$keys" ]]; then
+            break
+        fi
+
+        project_keys+=($keys)
+        ((page++))
+    done
+
+    echo "${project_keys[@]}"
+}
+
+get_project_loc() {
+    project_key=$1
+    response=$(curl -s -u "$SONAR_TOKEN:" "$SONARCLOUD_API/measures/component?component=$project_key&metricKeys=ncloc")
+    loc=$(echo "$response" | jq -r '.component.measures[0].value')
+    echo "${loc:-0}"
+}
+
+echo "Project Key,Lines of Code" > "$OUTPUT_FILE"
+
+projects=$(get_project_keys)
+
+for project in $projects; do
+    loc=$(get_project_loc "$project")
+    echo "$project,$loc" | tee -a "$OUTPUT_FILE"
+done
+
+echo "CSV report generated: $OUTPUT_FILE"
