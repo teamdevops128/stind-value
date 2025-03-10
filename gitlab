@@ -1,5 +1,5 @@
-As part of our disaster management strategy, I’d like to suggest that we consider using GitLab and Azure Repos as our version control solutions. Both platforms provide robust features to help ensure our code remains secure and accessible, even in the event of unforeseen disruptions.
-GitLab offers flexible repository management, and their disaster recovery features include automated backups and the ability to access the repository from anywhere. With the free tier, we can host up to 10 GB per repository and 5 GB total storage
+As part of our disaster management strategy, I'd like to suggest that we consider using GitLab and Azure Repos as our version control solutions. Both platforms provide robust features to help ensure our code remains secure and accessible.
 
+The pricing for GitLab is $0 for the free account, and we can host up to 10 GB per repository. There are also other plans available, such as GitLab Duo, which focuses more on AI capabilities for code writing, code generation, and code completion, but we do not require that. The free account allows access for only 5 users.
 
-Pricing (Azure Repos Basic Plan): Free for up to 5 users.
+The Azure Repos Basic Plan is also a good alternative, and we already have a backup script to back up data from our GitHub Enterprise account to the GitHub Teams account. With slight modifications, we can use the same script for Azure Repos. However, I would suggest procuring a new Azure DevOps account specifically for repository backups, as we will be running several deletion jobs to remove old backups, and we do not want our new data to be deleted.
