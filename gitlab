@@ -1,5 +1,21 @@
-As part of our disaster management strategy, I'd like to suggest that we consider using GitLab and Azure Repos as our version control solutions. Both platforms provide robust features to help ensure our code remains secure and accessible.
+As part of our security measures, I wanted to outline the necessary steps to enforce Single Sign-On (SSO) for external members in our GitHub Enterprise environment. Currently, we have SSO enabled for internal team members, and now we need to extend this configuration to ensure that external collaborators can only access our repositories through the same secure authentication method.
 
-The pricing for GitLab is $0 for the free account, and we can host up to 10 GB per repository. There are also other plans available, such as GitLab Duo, which focuses more on AI capabilities for code writing, code generation, and code completion, but we do not require that. The free account allows access for only 5 users.
+Here are the steps required to implement this:
 
-The Azure Repos Basic Plan is also a good alternative, and we already have a backup script to back up data from our GitHub Enterprise account to the GitHub Teams account. With slight modifications, we can use the same script for Azure Repos. However, I would suggest procuring a new Azure DevOps account specifically for repository backups, as we will be running several deletion jobs to remove old backups, and we do not want our new data to be deleted.
+1. Invite External Users to Microsoft Entra (Azure AD)
+External users need to be invited to our Microsoft Entra (formerly Azure AD) tenant as guest users. This can be done through the Azure portal by navigating to Azure Active Directory > Users > New guest user and adding the external members’ details.
+Once invited, external users will receive an email to accept the invitation and join the organization in Azure AD.
+2. Assign External Users to GitHub Organization
+After the external users are added to Microsoft Entra (Azure AD), we need to assign them to the relevant GitHub Enterprise organization.
+External users will be invited as collaborators to the necessary repositories or teams in GitHub.
+3. Enable SSO Enforcement in GitHub Enterprise
+Within GitHub Enterprise, we will need to enforce SSO authentication for both internal and external users.
+This can be done by navigating to Enterprise Settings > Authentication and enabling the Enforce SSO option. Once this is enabled, all users, including external collaborators, will need to authenticate via our Microsoft Entra (Azure AD) before accessing any repositories or organizations.
+4. Configure Access Control for External Users
+It is crucial to configure appropriate access control for external users. We should ensure that external collaborators only have the necessary level of access to specific repositories or teams, and sensitive information is protected.
+We can restrict their permissions and limit them to read-only access if necessary or assign them to specific teams.
+5. Testing the SSO Login Process for External Users
+After configuration, we should test the login process with a few external users to ensure everything is set up correctly.
+External users should be prompted to log in via Microsoft Entra (Azure AD) and will only gain access to the repositories they are authorized for.
+
+Please let me know if you’d like to discuss these steps further or need assistance in implementing them.
