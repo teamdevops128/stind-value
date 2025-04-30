@@ -1,0 +1,44 @@
+jobs:
+- job: ExportGitHubOrgRepos
+  displayName: 'Export GitHub Org Repos to CSV'
+  pool:
+    vmImage: 'ubuntu-latest'
+
+  steps:
+  - script: |
+      echo "Installing GitHub CLI..."
+      sudo apt update && sudo apt install -y gh jq
+
+      echo "Authenticating GitHub CLI..."
+      echo "${GH_TOKEN}" | gh auth login --with-token
+
+      echo "Fetching GitHub organization repo data..."
+
+      ORG="ab"
+      OUTPUT_FILE="github_org_repos.csv"
+
+      echo "Repository Name,Visibility,Default Branch,Created At,Updated At,Stars,Forks,Language" > "$OUTPUT_FILE"
+
+      gh repo list "$ORG" --limit 1000 --json name,visibility,defaultBranchRef,createdAt,updatedAt,stargazerCount,forkCount,primaryLanguage \
+        | jq -r '.[] | [
+            .name,
+            .visibility,
+            (.defaultBranchRef.name // "N/A"),
+            .createdAt,
+            .updatedAt,
+            .stargazerCount,
+            .forkCount,
+            (.primaryLanguage.name // "N/A")
+          ] | @csv' >> "$OUTPUT_FILE"
+
+      echo "CSV generated: $OUTPUT_FILE"
+    displayName: 'Generate GitHub Org CSV'
+    env:
+      GH_TOKEN: $(GH_TOKEN)
+
+  - task: PublishPipelineArtifact@1
+    inputs:
+      targetPath: 'github_org_repos.csv'
+      artifact: 'github-org-repos'
+      publishLocation: 'pipeline'
+    displayName: 'Publish GitHub Repo CSV'
